@@ -3,17 +3,80 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
+type OS = "mac" | "windows" | "other";
+
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [os, setOs] = useState<OS>("other");
 
   useEffect(() => {
     setIsVisible(true);
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 100); // Show button after scrolling 100px
+    };
+
+    // Basic OS detection
+    const detectOS = () => {
+      const platform = window.navigator.platform.toLowerCase();
+      const userAgent = window.navigator.userAgent.toLowerCase();
+
+      if (platform.includes("mac") || userAgent.includes("mac os x")) {
+        setOs("mac");
+      } else if (platform.includes("win") || userAgent.includes("windows")) {
+        setOs("windows");
+      } else {
+        setOs("other");
+      }
+    };
+
+    detectOS();
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <main className="relative min-h-screen text-white bg-[linear-gradient(to_bottom_left,rgba(210,255,130,0.85)_0%,rgba(185,255,90,0.9)_45%,rgba(0,255,120,0.95)_100%)] overflow-hidden">
       {/* Animated background elements */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,255,180,0.55),transparent_55%)]" />
+
+      {/* Floating Glassy Download Button */}
+      <button 
+        className={`fixed top-6 right-6 z-50 h-10 px-4 rounded-lg font-semibold text-white inline-flex items-center justify-center gap-2 text-sm transition-all duration-300 bg-gradient-to-br from-[#3FA3FF] to-[#2B8CFF] border border-white/30 shadow-[0_8px_32px_rgba(59,130,246,0.5)] hover:shadow-[0_12px_40px_rgba(59,130,246,0.6)] hover:scale-105 ${
+          isScrolled 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 -translate-y-4 pointer-events-none'
+        }`}
+      >
+        {/* OS-specific icon */}
+        {os === "mac" && (
+          <span
+            aria-hidden="true"
+            className="text-lg leading-none"
+          >
+            
+          </span>
+        )}
+
+        {os === "windows" && (
+          <svg 
+            className="w-4 h-4" 
+            viewBox="0 0 24 24" 
+            fill="white"
+            aria-hidden="true"
+          >
+            {/* Windows 11-style four-pane logo */}
+            <path d="M3 3l8-1.5v9H3V3zm10 0l8-1.5v10h-8V3zM3 13h8v9L3 20.5V13zm10 0h8v10l-8-1.5V13z" />
+          </svg>
+        )}
+
+        {/* You can add a generic icon here for 'other' OS if you want */}
+        {/* {os === "other" && (...)} */}
+
+        <span>Download</span>
+      </button>
 
       {/* Outer page wrapper */}
       <div className="relative mx-auto max-w-7xl px-6 py-10">
@@ -22,8 +85,6 @@ export default function Home() {
           {/* Navbar */}
           <header className="mb-12 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {/* Animated sphere */}
-              <div className="h-8 w-8 rounded-full border border-[#00ff66]/70 bg-gradient-to-br from-[#00ff66]/70 to-[#00ff99]/45 shadow-[0_0_30px_rgba(0,255,120,0.9)] animate-pulse-slow" />
               <Image
                 src="/Claritron logo-white.png"
                 alt="Claritron logo"
@@ -40,28 +101,27 @@ export default function Home() {
               <a href="#faq" className="hover:text-white transition-colors duration-200">FAQ</a>
             </nav>
 
-            <button className="rounded-full border border-[#00ff66]/80 px-6 py-2 text-sm font-medium text-white hover:bg-[#00ff66]/20 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-[#00ff66]/20">
-              Join the beta
-            </button>
+            {/* Original button removed from navbar */}
+            <div className="w-32"></div> {/* Spacer to maintain layout */}
           </header>
 
           {/* HERO SECTION */}
           <div className="grid flex-1 items-center gap-16 md:grid-cols-2">
             {/* Left Content */}
             <section className={`space-y-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/80">
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-white">
                 Your digital second brain • Always on • Always with you
               </p>
 
               <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl leading-tight">
                 The intelligence that learns{" "}
-                <span className="text-[#00ff4d] bg-gradient-to-r from-[#00ff4d] to-[#00ff99] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#A06BFF] to-[#3FA3FF] bg-clip-text text-transparent">
                   you
                 </span>
                 .
               </h1>
 
-              <p className="text-lg text-white/92 font-medium leading-relaxed">
+              <p className="text-lg text-white font-medium leading-relaxed">
                 Claritron sits quietly on top of your screen—reading, analyzing, and
                 tailoring everything to how <span className="font-bold">you</span> think and learn.
                 Not just another app. A personal AI overlay that actually knows and understands you.
@@ -70,7 +130,7 @@ export default function Home() {
 
               {/* Buttons */}
               <div className="flex flex-wrap items-center gap-4">
-                <button className="rounded-full bg-[#00ff66] px-8 py-3 font-semibold text-black hover:bg-[#00f75f] transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-[#00ff66]/30">
+                <button className="rounded-full bg-gradient-to-r from-[#A06BFF] to-[#3FA3FF] px-8 py-3 font-semibold text-white hover:opacity-90 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-[#A06BFF]/30">
                   Get early access
                 </button>
 
@@ -101,7 +161,7 @@ export default function Home() {
             <section className={`relative transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(0,255,120,0.55),transparent_60%)]" />
 
-              <div className="w-full max-w-md rounded-3xl border border-[#00ff66]/45 bg-[rgba(4,20,8,0.94)] p-6 backdrop-blur-xl shadow-[0_0_50px_rgba(0,255,120,0.3)] hover:shadow-[0_0_60px_rgba(0,255,120,0.4)] transition-all duration-500">
+              <div className="w-full max-w-md rounded-3xl border border-[#00ff66]/45 bg-[rgba(10,15,12,0.45)] backdrop-blur-2xl p-6 shadow-[0_0_55px_rgba(0,255,120,0.28)] hover:shadow-[0_0_65px_rgba(0,255,120,0.35)] transition-all duration-500">
                 
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
@@ -156,7 +216,7 @@ export default function Home() {
           <div className="mb-16 text-center">
             <h2 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl">
               Knowledge processing -{" "}
-              <span className="text-[#00ff4d] bg-gradient-to-r from-[#00ff4d] to-[#00ff99] bg-clip-text text-transparent">
+              <span className="text-[#00ff4d] bg-gradient-to-r from-[#A06BFF] to-[#3FA3FF] bg-clip-text text-transparent">
                 Evolved
               </span>
             </h2>
@@ -214,8 +274,7 @@ export default function Home() {
               >
                 <div className="mb-4 text-2xl">{feature.icon}</div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-                  {feature.title}
-                </p>
+                  {feature.title}</p>
                 <h3 className="mb-3 text-xl font-semibold text-white">
                   {feature.description}
                 </h3>
@@ -231,11 +290,7 @@ export default function Home() {
         <section id="how-it-works" className="my-32">
           <div className="mb-16 text-center">
             <h2 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl">
-              How Claritron{" "}
-              <span className="text-[#00ff4d] bg-gradient-to-r from-[#00ff4d] to-[#00ff99] bg-clip-text text-transparent">
-                Transforms
-              </span>{" "}
-              Learning
+              How Claritron Transforms Learning
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-white/90">
               Claritron adapts your digital world to align with your learning style and mental models.
@@ -269,7 +324,7 @@ export default function Home() {
               >
                 <div className="text-4xl mb-4">{step.icon}</div>
                 <div className="text-2xl font-bold text-[#00ff66] mb-2">{step.step}</div>
-                <h3 className="text-xl font-semibold text-white mb-4">{step.title}</h3>
+                <h3 className="text-xl font-semibold text:white mb-4">{step.title}</h3>
                 <p className="text-white/88 leading-relaxed">{step.description}</p>
               </div>
             ))}
@@ -286,7 +341,7 @@ export default function Home() {
               Join the beta and experience personalized learning that adapts to you, not the other way around.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="rounded-full bg-[#00ff66] px-8 py-3 font-semibold text-black hover:bg-[#00f75f] transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-[#00ff66]/30">
+              <button className="rounded-full bg-gradient-to-r from-[#A06BFF] to-[#3FA3FF] px-8 py-3 font-semibold text-white hover:opacity-90 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-[#A06BFF]/30">
                 Get early access
               </button>
               <button className="rounded-full border border-[#c9ffdd]/40 px-8 py-3 font-medium text-white/90 bg-[rgba(0,255,120,0.20)] backdrop-blur-md hover:bg-[rgba(0,255,120,0.28)] transition-all duration-200 hover:scale-105">
@@ -301,7 +356,6 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-6">
             <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
               <div className="flex items-center gap-3">
-                <div className="h-6 w-6 rounded-full border border-[#00ff66]/70 bg-gradient-to-br from-[#00ff66]/70 to-[#00ff99]/45 shadow-[0_0_20px_rgba(0,255,120,0.7)]" />
                 <span className="text-sm text-white/70">Claritron © 2024</span>
               </div>
               <nav className="flex gap-6 text-sm text-white/70">
